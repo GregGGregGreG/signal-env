@@ -20,7 +20,7 @@ public class SignalHandlerTask extends AbstractCancellableRunnable {
         long reject = 0;
         while (!isCancelled()) {
             Signal signal = waitForExternalSignal();
-            if (signalFilter.isAllowed(signal)) {
+            if (signalFilter.isAllowed()) {
                 if (reject != 0) {
                     System.out.println(Thread.currentThread().getName() + " - Rejects signals = " + reject);
                     reject = 0;
@@ -37,6 +37,6 @@ public class SignalHandlerTask extends AbstractCancellableRunnable {
     }
 
     private void process(Signal signal) {
-        signal.clear();
+
     }
 }

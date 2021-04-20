@@ -21,8 +21,8 @@ public class SignalFilter implements Filter {
     }
 
     @Override
-    public boolean isAllowed(Signal signal) {
-        long timeCreation = signal.getTimeCreating();
+    public boolean isAllowed() {
+        long timeCreation = System.nanoTime();
         lock.lock();  // block until condition holds
         try {
             boolean isAllowed = timeCreation - timeOffset >= timestamps.getAcquire(cursor.getAcquire());
@@ -36,5 +36,4 @@ public class SignalFilter implements Filter {
         }
         return false;
     }
-
 }
