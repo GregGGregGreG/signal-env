@@ -17,13 +17,17 @@ public class SignalHandlerTask extends AbstractCancellableRunnable {
     @Override
     public void run() {
         super.run();
+        long reject = 0;
         while (!isCancelled()) {
             Signal signal = waitForExternalSignal();
-            if (signalFilter.isAllowed()) {
+            if (signalFilter.isAllowed(signal)) {
+                if (reject != 0) {
+                    System.out.println(Thread.currentThread().getName() + " - Rejects signals = " + reject);
+                    reject = 0;
+                }
                 process(signal);
             } else {
-                // do nothing – signal is rejected
-                System.out.println("Reject Signal");
+                reject++;
             }
         }
     }
@@ -33,6 +37,6 @@ public class SignalHandlerTask extends AbstractCancellableRunnable {
     }
 
     private void process(Signal signal) {
-
+        signal.clear();
     }
 }

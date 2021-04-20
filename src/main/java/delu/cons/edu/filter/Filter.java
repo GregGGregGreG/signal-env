@@ -1,9 +1,7 @@
 package delu.cons.edu.filter;
 
+import delu.cons.edu.signal.Signal;
+
 public interface Filter {
-    boolean isAllowed();
-
-    void reset();
-
-    long periodNan();
+    boolean isAllowed(Signal signal);
 }

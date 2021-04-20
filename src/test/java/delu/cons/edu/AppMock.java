@@ -1,9 +1,9 @@
 package delu.cons.edu;
 
-import delu.cons.edu.filter.FilterTimerTask;
 import delu.cons.edu.filter.SignalFilter;
 import delu.cons.edu.signal.Signal;
 import delu.cons.edu.signal.SignalHandlerTask;
+import delu.cons.edu.signal.SignalImpl;
 
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -11,22 +11,21 @@ import java.util.concurrent.LinkedBlockingDeque;
 public class AppMock {
 
     public static void main(String[] args) {
-        SignalFilter signalFilter = new SignalFilter(1000_000_000, 1000_000_000);
-
-        FilterTimerTask signalFilterTask = new FilterTimerTask(signalFilter);
-        Thread signalFilterTaskThread = new Thread(signalFilterTask, "DSP - Signal Filter Timer");
-        signalFilterTaskThread.start();
+        SignalFilter signalFilter = new SignalFilter(50_000, 1_000_000_000);
 
         BlockingDeque<Signal> inputSignals = new LinkedBlockingDeque<>();
         SignalSourceMock signalSourceMock = new SignalSourceMock(1, inputSignals);
 
         SignalMockGeneratorTask<Signal> signalSignalMockGeneratorTask
-                = new SignalMockGeneratorTask<>( 20_000, inputSignals, () -> new Signal() {}, 500);
+                = new SignalMockGeneratorTask<>(2_000_000, inputSignals, SignalImpl::new, 45);
         Thread signalMockGeneratorTaskTread = new Thread(signalSignalMockGeneratorTask, "DSP - Signal Mock Generator");
         signalMockGeneratorTaskTread.start();
 
-        SignalHandlerTask signalHandlerTask = new SignalHandlerTask(signalFilter, signalSourceMock);
-        Thread signalHandlerTaskThread = new Thread(signalHandlerTask, "DSP - Signal Handler");
-        signalHandlerTaskThread.start();
+        int signalHandlerThreads = 20;
+        for (int i = 0; i < signalHandlerThreads; i++) {
+            SignalHandlerTask signalHandlerTask = new SignalHandlerTask(signalFilter, signalSourceMock);
+            Thread signalHandlerTaskThread = new Thread(signalHandlerTask, "DSP " + i + "- Signal Handler");
+            signalHandlerTaskThread.start();
+        }
     }
 }
